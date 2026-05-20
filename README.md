@@ -1,4 +1,4 @@
-# AI Interview Dashboard (UI only)
+# MockMate Dashboard (UI only)
 
 React + Tailwind dashboard scaffold (Vite). No backend, no auth, no external APIs.
 
