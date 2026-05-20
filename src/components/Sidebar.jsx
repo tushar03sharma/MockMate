@@ -14,7 +14,7 @@ const NavItem = ({ children, icon, active }) => (
 export default function Sidebar({ onToggleTheme }) {
   return (
     <aside className="w-64 hidden md:flex flex-col gap-4 p-4 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800">
-      <div className="text-lg font-semibold">AI Interview</div>
+      <div className="text-lg font-semibold">MockMate</div>
       <nav className="flex-1 flex flex-col gap-2">
         <NavItem icon={<svg viewBox="0 0 24 24" fill="none" className="w-5 h-5"><path d="M3 13h8V3H3v10zM3 21h8v-6H3v6zM13 21h8V11h-8v10zM13 3v6h8V3h-8z" stroke="currentColor" strokeWidth="1.2"/></svg>} active>
           Dashboard

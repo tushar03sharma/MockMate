@@ -1,6 +1,6 @@
 # MockMate Dashboard (UI only)
 
-React + Tailwind dashboard scaffold (Vite). No backend, no auth, no external APIs.
+AI-powered interview preparation platform built with React, Tailwind CSS, and Gemini API.
 
 Quick start
 

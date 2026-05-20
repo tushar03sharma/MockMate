@@ -1,10 +1,10 @@
 import React from 'react'
 
 const mock = [
-  { id: 1, name: 'Samira Khan', role: 'Frontend Engineer', date: '2026-05-18', duration: '45m', score: 86, status: 'Hired' },
-  { id: 2, name: 'Jordan Lee', role: 'Data Scientist', date: '2026-05-17', duration: '50m', score: 74, status: 'Follow-up' },
-  { id: 3, name: 'Alex Park', role: 'Backend Engineer', date: '2026-05-15', duration: '40m', score: 92, status: 'Hired' },
-  { id: 4, name: 'Priya Singh', role: 'ML Engineer', date: '2026-05-14', duration: '60m', score: 68, status: 'Rejected' }
+  { id: 1, name: 'Tushar Sharma', role: 'Frontend Engineer', date: '2026-05-18', duration: '45m', score: 86, status: 'Hired' },
+  { id: 2, name: 'Virat Kohli', role: 'Data Scientist', date: '2026-05-17', duration: '50m', score: 74, status: 'Follow-up' },
+  { id: 3, name: 'Rohit Sharma', role: 'Backend Engineer', date: '2026-05-15', duration: '40m', score: 92, status: 'Hired' },
+  { id: 4, name: 'Arushi Rawat', role: 'ML Engineer', date: '2026-05-14', duration: '60m', score: 78, status: 'Follow-up' }
 ]
 
 function StatusPill({ status }) {
