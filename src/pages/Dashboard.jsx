@@ -9,7 +9,7 @@ function IconSpark() {
   )
 }
 
-export default function Dashboard() {
+export default function Dashboard({ onNavigate, currentPage }) {
   const onToggleTheme = useCallback(() => {
     const root = document.documentElement
     const isDark = root.classList.toggle('dark')
@@ -18,7 +18,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen flex bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      <Sidebar onToggleTheme={onToggleTheme} />
+      <Sidebar onToggleTheme={onToggleTheme} onNavigate={onNavigate} currentPage={currentPage} />
       <main className="flex-1 p-6">
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-semibold">Dashboard</h1>

@@ -1,7 +1,8 @@
 import React from 'react'
 
-const NavItem = ({ children, icon, active }) => (
+const NavItem = ({ children, icon, active, onClick }) => (
   <button
+    onClick={onClick}
     className={`w-full flex items-center gap-3 px-4 py-2 rounded-md text-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition ${
       active ? 'bg-gray-100 dark:bg-gray-800 font-medium' : 'text-gray-700 dark:text-gray-200'
     }`}
@@ -11,16 +12,24 @@ const NavItem = ({ children, icon, active }) => (
   </button>
 )
 
-export default function Sidebar({ onToggleTheme }) {
+export default function Sidebar({ onToggleTheme, onNavigate, currentPage = 'dashboard' }) {
   return (
     <aside className="w-64 hidden md:flex flex-col gap-4 p-4 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800">
       <div className="text-lg font-semibold">MockMate</div>
       <nav className="flex-1 flex flex-col gap-2">
-        <NavItem icon={<svg viewBox="0 0 24 24" fill="none" className="w-5 h-5"><path d="M3 13h8V3H3v10zM3 21h8v-6H3v6zM13 21h8V11h-8v10zM13 3v6h8V3h-8z" stroke="currentColor" strokeWidth="1.2"/></svg>} active>
+        <NavItem 
+          icon={<svg viewBox="0 0 24 24" fill="none" className="w-5 h-5"><path d="M3 13h8V3H3v10zM3 21h8v-6H3v6zM13 21h8V11h-8v10zM13 3v6h8V3h-8z" stroke="currentColor" strokeWidth="1.2"/></svg>} 
+          active={currentPage === 'dashboard'}
+          onClick={() => onNavigate?.('dashboard')}
+        >
           Dashboard
         </NavItem>
-        <NavItem icon={<svg viewBox="0 0 24 24" fill="none" className="w-5 h-5"><circle cx="12" cy="8" r="3" stroke="currentColor" strokeWidth="1.2"/><path d="M6 20v-1a4 4 0 014-4h4a4 4 0 014 4v1" stroke="currentColor" strokeWidth="1.2"/></svg>}>
-          Candidates
+        <NavItem 
+          icon={<svg viewBox="0 0 24 24" fill="none" className="w-5 h-5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3" stroke="currentColor" strokeWidth="1.2" fill="none"/></svg>}
+          active={currentPage === 'interview'}
+          onClick={() => onNavigate?.('interview')}
+        >
+          Practice
         </NavItem>
         <NavItem icon={<svg viewBox="0 0 24 24" fill="none" className="w-5 h-5"><path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" strokeWidth="1.2"/></svg>}>
           Settings
