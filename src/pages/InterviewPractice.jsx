@@ -58,7 +58,7 @@ export default function InterviewPractice({ onNavigate, currentPage }) {
   return (
     <div className="min-h-screen flex bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <Sidebar onToggleTheme={onToggleTheme} onNavigate={onNavigate} currentPage={currentPage} />
-      <main className="flex-1 p-6">
+      <main className="flex-1 p-6 pb-24 md:pb-6">
         <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -76,7 +76,7 @@ export default function InterviewPractice({ onNavigate, currentPage }) {
         </div>
 
         {/* Answer Input Section */}
-        {!feedback && (
+        {!feedback && !isLoading && (
           <div className="space-y-4 mb-8">
             <AnswerInput value={answer} onChange={(e) => setAnswer(e.target.value)} />
             <div className="flex gap-3">
@@ -121,6 +121,7 @@ export default function InterviewPractice({ onNavigate, currentPage }) {
                 Try Next Question
               </button>
               <button
+                onClick={() => onNavigate('dashboard')}
                 className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium rounded-lg transition"
               >
                 View Details
@@ -129,6 +130,7 @@ export default function InterviewPractice({ onNavigate, currentPage }) {
           </div>
         )}
       </div>
+      </main>
     </div>
   )
 }

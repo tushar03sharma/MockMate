@@ -19,7 +19,7 @@ export default function Dashboard({ onNavigate, currentPage }) {
   return (
     <div className="min-h-screen flex bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <Sidebar onToggleTheme={onToggleTheme} onNavigate={onNavigate} currentPage={currentPage} />
-      <main className="flex-1 p-6">
+      <main className="flex-1 p-6 pb-24 md:pb-6">
         <header className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-semibold">Dashboard</h1>
           <div className="text-sm text-gray-500">Welcome back — here's the interview summary.</div>
