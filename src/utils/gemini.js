@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3001/api/feedback'
+const API_URL = '/api/feedback'
 
 export async function getInterviewFeedback(question, answer) {
   if (!question || !answer) {
