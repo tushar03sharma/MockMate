@@ -1,6 +1,6 @@
-# MockMate Dashboard (UI only)
+# MockMate 
 
-AI-powered interview preparation platform built with React, Tailwind CSS, and Gemini API.
+AI-powered interview preparation platform built with React, Tailwind CSS, and Gemini inference.
 
 Quick start
 

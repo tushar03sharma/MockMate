@@ -5,14 +5,33 @@
  * Port: 3001
  */
 
+// Load .env file using Node built-ins (no extra deps needed)
+const fs = require('fs')
+const path = require('path')
+try {
+  const envPath = path.join(__dirname, '.env')
+  const envFile = fs.readFileSync(envPath, 'utf8')
+  envFile.split('\n').forEach((line) => {
+    const trimmed = line.trim()
+    if (!trimmed || trimmed.startsWith('#')) return
+    const idx = trimmed.indexOf('=')
+    if (idx === -1) return
+    const key = trimmed.slice(0, idx).trim()
+    const val = trimmed.slice(idx + 1).trim()
+    if (key && val && !process.env[key]) process.env[key] = val
+  })
+} catch (e) {
+  // .env not found — rely on shell environment
+}
+
 const http = require('http')
 const https = require('https')
 
 const PORT = process.env.PORT || 3001
 
+const GEMINI_KEY = process.env.VITE_GEMINI_API_KEY
 const HUGGINGFACE_KEY = process.env.VITE_HUGGINGFACE_API_KEY
 const OPENAI_KEY = process.env.VITE_OPENAI_API_KEY
-const GEMINI_KEY = process.env.VITE_GEMINI_API_KEY
 
 const buildPrompt = (question, answer) => `
 You are an expert technical interviewer. Evaluate the following interview answer and return structured JSON feedback.
@@ -34,6 +53,49 @@ Respond with ONLY a valid JSON object — no markdown, no code fences, no explan
   "improvements": ["<improvement 1>", "<improvement 2>", "<improvement 3>"]
 }
 `.trim()
+
+const fetchGemini = (prompt) =>
+  new Promise((resolve, reject) => {
+    const model = 'gemini-2.5-flash'
+    const path = `/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`
+    const body = JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.4, maxOutputTokens: 4096 },
+    })
+
+    const options = {
+      hostname: 'generativelanguage.googleapis.com',
+      port: 443,
+      path,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(body),
+      },
+    }
+
+    const req = https.request(options, (res) => {
+      let data = ''
+      res.on('data', (chunk) => { data += chunk })
+      res.on('end', () => {
+        if (res.statusCode !== 200) {
+          reject(new Error(`Gemini API returned ${res.statusCode}: ${data}`))
+        } else {
+          try {
+            const parsed = JSON.parse(data)
+            const text = parsed?.candidates?.[0]?.content?.parts?.[0]?.text || ''
+            resolve(text)
+          } catch (e) {
+            reject(new Error(`Failed to parse Gemini response: ${e.message}`))
+          }
+        }
+      })
+    })
+
+    req.on('error', (e) => reject(e))
+    req.write(body)
+    req.end()
+  })
 
 const fetchHuggingFace = (prompt) =>
   new Promise((resolve, reject) => {
@@ -149,6 +211,18 @@ const handleFeedbackRequest = async (question, answer) => {
 
   const prompt = buildPrompt(question, answer)
 
+  if (GEMINI_KEY) {
+    try {
+      console.log('[Gemini] Calling Gemini API...')
+      const text = await fetchGemini(prompt)
+      const result = parseJson(text)
+      console.log('[Gemini] Success')
+      return result
+    } catch (err) {
+      console.warn('[Gemini] Error:', err.message)
+    }
+  }
+
   if (HUGGINGFACE_KEY) {
     try {
       console.log('[HF] Calling Hugging Face API...')
@@ -217,9 +291,10 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, () => {
   console.log(`\n✓ Backend API server running on http://localhost:${PORT}`)
   console.log(`  Endpoint: POST /api/feedback`)
-  if (HUGGINGFACE_KEY) console.log('  Provider: Hugging Face (primary)')
+  if (GEMINI_KEY) console.log('  Provider: Google Gemini (primary)')
+  if (HUGGINGFACE_KEY) console.log('  Provider: Hugging Face (fallback)')
   if (OPENAI_KEY) console.log('  Provider: OpenAI (fallback)')
-  if (!HUGGINGFACE_KEY && !OPENAI_KEY)
-    console.warn('  ⚠ No API keys configured! Set VITE_HUGGINGFACE_API_KEY or VITE_OPENAI_API_KEY')
+  if (!GEMINI_KEY && !HUGGINGFACE_KEY && !OPENAI_KEY)
+    console.warn('  ⚠ No API keys configured! Set VITE_GEMINI_API_KEY, VITE_HUGGINGFACE_API_KEY, or VITE_OPENAI_API_KEY')
   console.log('')
 })
