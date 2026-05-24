@@ -5,11 +5,38 @@ import AnswerInput from '../components/AnswerInput'
 import LoadingAnimation from '../components/LoadingAnimation'
 import FeedbackCard from '../components/FeedbackCard'
 import { getInterviewFeedback } from '../utils/gemini'
+import { saveAttempt } from '../utils/history'
+import { CATEGORIES, getRandomQuestion } from '../utils/questions'
 
-// ─── Sample question (can be expanded to a question bank later) ──────────────
-const mockQuestion = {
-  text: 'Explain the difference between REST and GraphQL APIs, and when you would use each.',
-  difficulty: 'Medium',
+// ─── Category pill colours ─────────────────────────────────────────────────────
+const CAT_ACTIVE = {
+  Frontend:   'bg-sky-600 text-white dark:bg-sky-500',
+  Backend:    'bg-violet-600 text-white dark:bg-violet-500',
+  DSA:        'bg-amber-500 text-white',
+  HR:         'bg-pink-600 text-white dark:bg-pink-500',
+  Behavioral: 'bg-emerald-600 text-white dark:bg-emerald-500',
+}
+const CAT_IDLE =
+  'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500'
+
+// ─── Category Selector ─────────────────────────────────────────────────────────
+function CategorySelector({ selected, onSelect }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {CATEGORIES.map((cat) => (
+        <button
+          key={cat}
+          id={`cat-${cat.toLowerCase()}`}
+          onClick={() => onSelect(cat)}
+          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-150 ${
+            selected === cat ? CAT_ACTIVE[cat] : CAT_IDLE
+          }`}
+        >
+          {cat}
+        </button>
+      ))}
+    </div>
+  )
 }
 
 // ─── Error Card ───────────────────────────────────────────────────────────────
@@ -36,6 +63,8 @@ function ErrorCard({ message, onRetry }) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function InterviewPractice({ onNavigate, currentPage }) {
+  const [category, setCategory]   = useState('Frontend')
+  const [question, setQuestion]   = useState(() => getRandomQuestion('Frontend'))
   const [answer, setAnswer]       = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [feedback, setFeedback]   = useState(null)
@@ -47,7 +76,24 @@ export default function InterviewPractice({ onNavigate, currentPage }) {
     localStorage.setItem('theme', isDark ? 'dark' : 'light')
   }, [])
 
-  // ── Submit: call the AI feedback API ──────────────────────────────────────
+  // ── Change category → pick a new question ───────────────────────────────────
+  const handleCategorySelect = (cat) => {
+    setCategory(cat)
+    setQuestion(getRandomQuestion(cat))
+    setAnswer('')
+    setFeedback(null)
+    setError(null)
+  }
+
+  // ── Shuffle to another question in same category ────────────────────────────
+  const handleShuffle = () => {
+    setQuestion(getRandomQuestion(category))
+    setAnswer('')
+    setFeedback(null)
+    setError(null)
+  }
+
+  // ── Submit: call the AI feedback API + auto-save ───────────────────────────
   const handleSubmit = async () => {
     if (!answer.trim()) {
       alert('Please enter your answer first.')
@@ -59,8 +105,23 @@ export default function InterviewPractice({ onNavigate, currentPage }) {
     setFeedback(null)
 
     try {
-      const result = await getInterviewFeedback(mockQuestion.text, answer)
+      const result = await getInterviewFeedback(question.text, answer)
       setFeedback(result)
+
+      // Auto-save to localStorage
+      saveAttempt({
+        question: question.text,
+        difficulty: question.difficulty,
+        category,
+        answer,
+        score: result.score,
+        communicationScore: result.communicationScore,
+        technicalDepthScore: result.technicalDepthScore,
+        clarityScore: result.clarityScore,
+        overall: result.overall,
+        strengths: result.strengths,
+        improvements: result.improvements,
+      })
     } catch (err) {
       setError(err.message || 'An unexpected error occurred. Please try again.')
     } finally {
@@ -68,14 +129,14 @@ export default function InterviewPractice({ onNavigate, currentPage }) {
     }
   }
 
-  // ── Reset: go back to the answer input ──────────────────────────────────
+  // ── Reset: back to answer input, same question ───────────────────────────
   const handleReset = () => {
     setAnswer('')
     setFeedback(null)
     setError(null)
   }
 
-  // ── Retry: clear error and keep the typed answer ─────────────────────────
+  // ── Retry: clear error and resubmit ──────────────────────────────────────
   const handleRetry = () => {
     setError(null)
     handleSubmit()
@@ -89,21 +150,46 @@ export default function InterviewPractice({ onNavigate, currentPage }) {
         <div className="max-w-3xl mx-auto">
 
           {/* Header */}
-          <div className="mb-8">
+          <div className="mb-6">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
               Interview Practice
             </h1>
             <p className="text-gray-600 dark:text-gray-300">
-              Answer the question below and get AI feedback on your response.
+              Choose a category and get AI feedback on your answer.
             </p>
           </div>
 
-          {/* Question */}
-          <div className="mb-8">
-            <QuestionCard question={mockQuestion.text} difficulty={mockQuestion.difficulty} />
+          {/* Category selector */}
+          <div className="mb-5">
+            <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+              Category
+            </p>
+            <CategorySelector selected={category} onSelect={handleCategorySelect} />
           </div>
 
-          {/* Answer input — hidden while loading or showing feedback/error */}
+          {/* Question */}
+          <div className="mb-2">
+            <QuestionCard question={question.text} difficulty={question.difficulty} />
+          </div>
+
+          {/* Shuffle button */}
+          {!feedback && !isLoading && (
+            <div className="flex justify-end mb-6">
+              <button
+                onClick={handleShuffle}
+                className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500
+                           hover:text-indigo-500 dark:hover:text-indigo-400 transition"
+              >
+                <svg viewBox="0 0 24 24" fill="none" className="w-3.5 h-3.5">
+                  <path d="M17 1l4 4-4 4M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 01-4 4H3"
+                    stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                New question
+              </button>
+            </div>
+          )}
+
+          {/* Answer input */}
           {!feedback && !isLoading && !error && (
             <div className="space-y-4 mb-8">
               <AnswerInput
@@ -112,15 +198,20 @@ export default function InterviewPractice({ onNavigate, currentPage }) {
               />
               <div className="flex gap-3">
                 <button
+                  id="submit-answer"
                   onClick={handleSubmit}
                   disabled={!answer.trim()}
-                  className="flex-1 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium rounded-lg transition"
+                  className="flex-1 px-6 py-3 bg-indigo-600 hover:bg-indigo-700
+                             disabled:bg-gray-300 dark:disabled:bg-gray-700
+                             disabled:cursor-not-allowed text-white font-medium rounded-lg transition"
                 >
                   Submit Answer
                 </button>
                 <button
                   onClick={handleReset}
-                  className="px-6 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium rounded-lg transition"
+                  className="px-6 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300
+                             dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100
+                             font-medium rounded-lg transition"
                 >
                   Clear
                 </button>
@@ -151,6 +242,15 @@ export default function InterviewPractice({ onNavigate, currentPage }) {
           {/* Feedback */}
           {feedback && !isLoading && (
             <div className="space-y-6">
+              {/* Saved indicator */}
+              <div className="flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400">
+                <svg viewBox="0 0 24 24" fill="none" className="w-3.5 h-3.5">
+                  <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2"
+                    strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Saved to history
+              </div>
+
               <FeedbackCard
                 score={feedback.score}
                 overall={feedback.overall}
@@ -160,18 +260,22 @@ export default function InterviewPractice({ onNavigate, currentPage }) {
                 strengths={feedback.strengths}
                 improvements={feedback.improvements}
               />
-              <div className="flex gap-3">
+
+              <div className="flex gap-3 flex-wrap">
                 <button
-                  onClick={handleReset}
-                  className="flex-1 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition"
+                  onClick={handleShuffle}
+                  className="flex-1 px-6 py-3 bg-indigo-600 hover:bg-indigo-700
+                             text-white font-medium rounded-lg transition"
                 >
                   Try Next Question
                 </button>
                 <button
-                  onClick={() => onNavigate('dashboard')}
-                  className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium rounded-lg transition"
+                  onClick={() => onNavigate('history')}
+                  className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700
+                             hover:bg-gray-300 dark:hover:bg-gray-600
+                             text-gray-900 dark:text-gray-100 font-medium rounded-lg transition"
                 >
-                  Back to Dashboard
+                  View History
                 </button>
               </div>
             </div>
