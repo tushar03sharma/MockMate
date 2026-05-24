@@ -12,6 +12,12 @@ const practiceIcon = (
   </svg>
 )
 
+const historyIcon = (
+  <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
+    <path d="M12 8v4l2.5 2.5M3.05 11a9 9 0 1 0 .5-3M3 4v4h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
 const settingsIcon = (
   <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
     <path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" strokeWidth="1.2"/>
@@ -71,6 +77,13 @@ export default function Sidebar({ onToggleTheme, onNavigate, currentPage = 'dash
           >
             Practice
           </NavItem>
+          <NavItem
+            icon={historyIcon}
+            active={currentPage === 'history'}
+            onClick={() => onNavigate?.('history')}
+          >
+            History
+          </NavItem>
           <NavItem icon={settingsIcon}>
             Settings
           </NavItem>
@@ -102,8 +115,12 @@ export default function Sidebar({ onToggleTheme, onNavigate, currentPage = 'dash
         >
           Practice
         </MobileNavItem>
-        <MobileNavItem icon={settingsIcon}>
-          Settings
+        <MobileNavItem
+          icon={historyIcon}
+          active={currentPage === 'history'}
+          onClick={() => onNavigate?.('history')}
+        >
+          History
         </MobileNavItem>
         <MobileNavItem icon={themeIcon} onClick={onToggleTheme}>
           Theme

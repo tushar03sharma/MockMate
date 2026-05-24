@@ -20,3 +20,29 @@ body {
 
 .scrollbar-thin::-webkit-scrollbar { height:8px; width:8px }
 .scrollbar-thumb-rounded::-webkit-scrollbar-thumb { border-radius:6px }
+
+/* ── History card fade-in ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out both;
+}
+
+/* ── Detail modal slide-up ── */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-slideUp {
+  animation: slideUp 0.25s ease-out both;
+}
+
+/* ── Line clamp for question preview ── */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
