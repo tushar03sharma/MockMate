@@ -62,9 +62,17 @@ function ErrorCard({ message, onRetry }) {
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-export default function InterviewPractice({ onNavigate, currentPage }) {
-  const [category, setCategory]   = useState('Frontend')
-  const [question, setQuestion]   = useState(() => getRandomQuestion('Frontend'))
+export default function InterviewPractice({ onNavigate, currentPage, initialQuestion = null }) {
+  // If launched from Resume page, use that question; otherwise pick a random one
+  const [category, setCategory]   = useState(
+    initialQuestion?.category || 'Frontend'
+  )
+  const [question, setQuestion]   = useState(() =>
+    initialQuestion
+      ? { text: initialQuestion.text, difficulty: initialQuestion.difficulty, category: initialQuestion.category }
+      : getRandomQuestion('Frontend')
+  )
+  const [fromResume]              = useState(!!initialQuestion)
   const [answer, setAnswer]       = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [feedback, setFeedback]   = useState(null)
@@ -106,9 +114,11 @@ export default function InterviewPractice({ onNavigate, currentPage }) {
 
     try {
       const result = await getInterviewFeedback(question.text, answer)
+      console.log('feedback received:', result)
       setFeedback(result)
 
-      // Auto-save to localStorage
+      // save to localStorage so it shows up in history
+      // TODO: maybe ask user before saving? idk
       saveAttempt({
         question: question.text,
         difficulty: question.difficulty,
@@ -151,21 +161,41 @@ export default function InterviewPractice({ onNavigate, currentPage }) {
 
           {/* Header */}
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-              Interview Practice
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300">
-              Choose a category and get AI feedback on your answer.
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                Interview Practice
+              </h1>
+              {fromResume && (
+                <span className="px-2.5 py-1 rounded-full text-xs font-medium
+                                 bg-indigo-100 text-indigo-700
+                                 dark:bg-indigo-900/40 dark:text-indigo-300
+                                 border border-indigo-200 dark:border-indigo-700
+                                 flex items-center gap-1">
+                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+                      stroke="currentColor" strokeWidth="1.5"/>
+                    <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="1.5"/>
+                  </svg>
+                  From your resume
+                </span>
+              )}
+            </div>
+            <p className="text-gray-600 dark:text-gray-300 mt-2">
+              {fromResume
+                ? 'Practising a resume-tailored question. Answer below and get AI feedback.'
+                : 'Choose a category and get AI feedback on your answer.'}
             </p>
           </div>
 
-          {/* Category selector */}
-          <div className="mb-5">
-            <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
-              Category
-            </p>
-            <CategorySelector selected={category} onSelect={handleCategorySelect} />
-          </div>
+          {/* Category selector — hidden when question comes from Resume */}
+          {!fromResume && (
+            <div className="mb-5">
+              <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+                Category
+              </p>
+              <CategorySelector selected={category} onSelect={handleCategorySelect} />
+            </div>
+          )}
 
           {/* Question */}
           <div className="mb-2">
@@ -262,20 +292,22 @@ export default function InterviewPractice({ onNavigate, currentPage }) {
               />
 
               <div className="flex gap-3 flex-wrap">
+                {!fromResume && (
+                  <button
+                    onClick={handleShuffle}
+                    className="flex-1 px-6 py-3 bg-indigo-600 hover:bg-indigo-700
+                               text-white font-medium rounded-lg transition"
+                  >
+                    Try Next Question
+                  </button>
+                )}
                 <button
-                  onClick={handleShuffle}
-                  className="flex-1 px-6 py-3 bg-indigo-600 hover:bg-indigo-700
-                             text-white font-medium rounded-lg transition"
-                >
-                  Try Next Question
-                </button>
-                <button
-                  onClick={() => onNavigate('history')}
+                  onClick={() => onNavigate(fromResume ? 'resume' : 'history')}
                   className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700
                              hover:bg-gray-300 dark:hover:bg-gray-600
                              text-gray-900 dark:text-gray-100 font-medium rounded-lg transition"
                 >
-                  View History
+                  {fromResume ? 'Back to Resume' : 'View History'}
                 </button>
               </div>
             </div>
