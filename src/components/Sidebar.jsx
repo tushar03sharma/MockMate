@@ -114,6 +114,10 @@ export default function Sidebar({ onToggleTheme, onNavigate, currentPage = 'dash
             Toggle Theme
           </button>
         </div>
+        <div className="text-xs text-gray-400 dark:text-gray-600 px-1 pb-1">
+          © 2026 Tushar Sharma
+        </div>
+
       </aside>
 
       {/* Mobile bottom navigation */}
