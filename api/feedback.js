@@ -85,24 +85,31 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
 
   if (req.method === 'OPTIONS') {
-    res.status(200).end()
+    res.statusCode = 200
+    res.end()
     return
   }
 
   if (req.method !== 'POST') {
-    res.status(404).json({ error: 'Not found' })
+    res.statusCode = 404
+    res.setHeader('Content-Type', 'application/json')
+    res.end(JSON.stringify({ error: 'Not found' }))
     return
   }
 
   const { question, answer } = req.body || {}
 
   if (!question || !answer) {
-    res.status(400).json({ error: 'question and answer are required' })
+    res.statusCode = 400
+    res.setHeader('Content-Type', 'application/json')
+    res.end(JSON.stringify({ error: 'question and answer are required' }))
     return
   }
 
   if (!GEMINI_KEY) {
-    res.status(500).json({ error: 'VITE_GEMINI_API_KEY is not configured on the server.' })
+    res.statusCode = 500
+    res.setHeader('Content-Type', 'application/json')
+    res.end(JSON.stringify({ error: 'VITE_GEMINI_API_KEY is not configured on the server.' }))
     return
   }
 
@@ -110,9 +117,13 @@ module.exports = async function handler(req, res) {
     const prompt = buildPrompt(question, answer)
     const text = await fetchGemini(prompt)
     const result = parseJson(text)
-    res.status(200).json(result)
+    res.statusCode = 200
+    res.setHeader('Content-Type', 'application/json')
+    res.end(JSON.stringify(result))
   } catch (err) {
     console.error('[Gemini Error]', err.message)
-    res.status(500).json({ error: err.message })
+    res.statusCode = 500
+    res.setHeader('Content-Type', 'application/json')
+    res.end(JSON.stringify({ error: err.message }))
   }
 }

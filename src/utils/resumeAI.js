@@ -1,9 +1,14 @@
-// gemini api stuff
+// gemini api stuff for resume feature
 // using the free tier so hopefully it doesnt rate limit lol
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY
-const GEMINI_MODEL = 'gemini-2.5-flash'
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`
+
+// try these models in order if one is overloaded or quota exceeded
+const GEMINI_MODELS = ['gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-2.5-flash']
+
+function geminiUrl(model) {
+  return `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`
+}
 
 // builds the prompt - took a while to get this right, had to experiment a lot
 function buildPrompt(resumeText) {
@@ -57,10 +62,9 @@ function stripCodeFences(text) {
 
 export async function generateQuestionsFromResume(resumeText) {
   if (!GEMINI_API_KEY) {
-    throw new Error('No API key found. Add VITE_GEMINI_API_KEY to your .env file')
+    console.warn('no api key, using mock data')
+    return mockResumeResponse(resumeText)
   }
-
-  console.log('calling gemini api...')
 
   const body = JSON.stringify({
     contents: [{ parts: [{ text: buildPrompt(resumeText) }] }],
@@ -70,44 +74,129 @@ export async function generateQuestionsFromResume(resumeText) {
     },
   })
 
-  const response = await fetch(GEMINI_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body,
-  })
+  let lastError
+  for (const model of GEMINI_MODELS) {
+    console.log('trying model:', model)
+    try {
+      const response = await fetch(geminiUrl(model), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body,
+      })
 
-  if (!response.ok) {
-    const errText = await response.text().catch(() => '')
-    console.error('gemini error:', errText)
-    throw new Error(`Gemini API error (${response.status}): ${errText.slice(0, 200)}`)
+      if (!response.ok) {
+        const errText = await response.text().catch(() => '')
+        const err = new Error(`Gemini API error (${response.status}): ${errText.slice(0, 200)}`)
+        // only retry on overload/quota/not-found errors
+        if (response.status === 503 || response.status === 429 || response.status === 404) {
+          console.warn(`model ${model} overloaded or quota hit, trying next...`)
+          lastError = err
+          continue
+        }
+        throw err
+      }
+
+      const data = await response.json()
+      console.log('gemini response received from', model)
+
+      const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text
+      if (!raw) throw new Error('Got empty response from Gemini, try again')
+
+      let parsed
+      try {
+        parsed = JSON.parse(stripCodeFences(raw))
+      } catch (e) {
+        console.error('failed to parse json:', raw.slice(0, 300))
+        throw new Error('Could not parse the AI response. Maybe resume was too short?')
+      }
+
+      if (!Array.isArray(parsed.questions) || parsed.questions.length === 0) {
+        throw new Error('No questions were generated. Try uploading a more detailed resume.')
+      }
+
+      return {
+        skills: Array.isArray(parsed.skills) ? parsed.skills : [],
+        projects: Array.isArray(parsed.projects) ? parsed.projects : [],
+        experienceLevel: parsed.experienceLevel || 'Mid-level',
+        questions: parsed.questions,
+      }
+    } catch (err) {
+      if (err.message.includes('503') || err.message.includes('429') || err.message.includes('overloaded')) {
+        lastError = err
+        continue
+      }
+      throw err
+    }
   }
 
-  const data = await response.json()
-  console.log('gemini response received')
+  // all models failed — fall back to mock so the app still works
+  console.warn('all gemini models failed, using mock resume response')
+  return mockResumeResponse(resumeText)
+}
 
-  const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text
+// mock response for when api quota is exhausted
+// tries to detect skills from resume text so it still feels somewhat personalised
+function mockResumeResponse(resumeText) {
+  const text = (resumeText || '').toLowerCase()
 
-  if (!raw) {
-    throw new Error('Got empty response from Gemini, try again')
-  }
-
-  let parsed
-  try {
-    parsed = JSON.parse(stripCodeFences(raw))
-  } catch (e) {
-    console.error('failed to parse json:', raw.slice(0, 300))
-    throw new Error('Could not parse the AI response. Maybe resume was too short?')
-  }
-
-  // make sure we actually got questions back
-  if (!Array.isArray(parsed.questions) || parsed.questions.length === 0) {
-    throw new Error('No questions were generated. Try uploading a more detailed resume.')
-  }
+  const allSkills = ['React', 'JavaScript', 'Node.js', 'Python', 'Java', 'CSS', 'HTML',
+    'MongoDB', 'SQL', 'Express', 'TypeScript', 'Git', 'REST APIs', 'Docker', 'AWS', 'C++', 'Firebase']
+  const detected = allSkills.filter(s => text.includes(s.toLowerCase()))
+  const skills = detected.length >= 3 ? detected : ['JavaScript', 'React', 'Node.js', 'Git', 'REST APIs']
 
   return {
-    skills: Array.isArray(parsed.skills) ? parsed.skills : [],
-    projects: Array.isArray(parsed.projects) ? parsed.projects : [],
-    experienceLevel: parsed.experienceLevel || 'Mid-level',
-    questions: parsed.questions,
+    skills,
+    projects: ['Personal Project', 'College Assignment App'],
+    experienceLevel: 'Junior',
+    questions: [
+      {
+        question: `You listed ${skills[0]} as a skill. Can you explain a challenging problem you solved using it?`,
+        category: 'Technical',
+        difficulty: 'Medium',
+        tag: skills[0],
+      },
+      {
+        question: `Walk me through a project where you used ${skills[1] || skills[0]}. What was your role and contribution?`,
+        category: 'Project',
+        difficulty: 'Medium',
+        tag: skills[1] || skills[0],
+      },
+      {
+        question: `How do you approach debugging when something breaks and you have no idea why?`,
+        category: 'Technical',
+        difficulty: 'Hard',
+        tag: 'Debugging',
+      },
+      {
+        question: `Tell me about a time you had to learn something new quickly for a deadline. How did you manage?`,
+        category: 'Behavioral',
+        difficulty: 'Easy',
+        tag: 'Learning',
+      },
+      {
+        question: `What's the difference between ${skills[0]} and an alternative, and when would you pick one over the other?`,
+        category: 'Technical',
+        difficulty: 'Medium',
+        tag: skills[0],
+      },
+      {
+        question: `Describe the most complex project on your resume. What was the hardest technical challenge?`,
+        category: 'Project',
+        difficulty: 'Hard',
+        tag: 'Architecture',
+      },
+      {
+        question: `How do you make sure your code is readable and maintainable for other developers?`,
+        category: 'Behavioral',
+        difficulty: 'Easy',
+        tag: 'Code Quality',
+      },
+      {
+        question: `If a REST API you built is responding slowly, how would you go about finding and fixing the bottleneck?`,
+        category: 'Technical',
+        difficulty: 'Hard',
+        tag: 'Performance',
+      },
+    ],
   }
 }
