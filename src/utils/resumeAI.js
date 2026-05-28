@@ -86,13 +86,17 @@ export async function generateQuestionsFromResume(resumeText) {
 
       if (!response.ok) {
         const errText = await response.text().catch(() => '')
-        const err = new Error(`Gemini API error (${response.status}): ${errText.slice(0, 200)}`)
-        // only retry on overload/quota/not-found errors
-        if (response.status === 503 || response.status === 429 || response.status === 404) {
-          console.warn(`model ${model} overloaded or quota hit, trying next...`)
+        const msg = `Gemini API error (${response.status}): ${errText.slice(0, 200)}`
+        const err = new Error(msg)
+        
+        // Retry on rate limiting, service unavailable, and server errors
+        if (response.status === 503 || response.status === 429 || response.status === 500 || response.status === 502 || response.status === 504) {
+          console.warn(`model ${model} returned ${response.status}, trying next...`)
           lastError = err
           continue
         }
+        
+        // Don't retry on client errors (unless it's a temporary gateway error)
         throw err
       }
 
@@ -100,17 +104,30 @@ export async function generateQuestionsFromResume(resumeText) {
       console.log('gemini response received from', model)
 
       const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text
-      if (!raw) throw new Error('Got empty response from Gemini, try again')
+      if (!raw) {
+        const msg = `Got empty response from Gemini: ${JSON.stringify(data).slice(0, 200)}`
+        console.warn(msg)
+        throw new Error(msg)
+      }
 
       let parsed
       try {
         parsed = JSON.parse(stripCodeFences(raw))
       } catch (e) {
-        console.error('failed to parse json:', raw.slice(0, 300))
-        throw new Error('Could not parse the AI response. Maybe resume was too short?')
+        console.error('failed to parse json from response:', raw.slice(0, 300))
+        throw new Error(`Could not parse the AI response: ${e.message}`)
       }
 
-      if (!Array.isArray(parsed.questions) || parsed.questions.length === 0) {
+      // Validate the parsed response has the expected structure
+      if (!parsed || typeof parsed !== 'object') {
+        throw new Error('Invalid response structure: not an object')
+      }
+
+      if (!Array.isArray(parsed.questions)) {
+        throw new Error('Invalid response structure: questions is not an array')
+      }
+
+      if (parsed.questions.length === 0) {
         throw new Error('No questions were generated. Try uploading a more detailed resume.')
       }
 
@@ -121,16 +138,23 @@ export async function generateQuestionsFromResume(resumeText) {
         questions: parsed.questions,
       }
     } catch (err) {
-      if (err.message.includes('503') || err.message.includes('429') || err.message.includes('overloaded')) {
+      // Retry on rate limit/overload errors and other temporary failures
+      if (err.message.includes('503') || err.message.includes('429') || err.message.includes('overloaded') || err.message.includes('parse')) {
         lastError = err
+        console.warn(`model ${model} failed with ${err.message.slice(0, 100)}, trying next...`)
         continue
       }
-      throw err
+      // For unexpected errors, still save and continue to next model instead of throwing
+      lastError = err
+      continue
     }
   }
 
   // all models failed — fall back to mock so the app still works
   console.warn('all gemini models failed, using mock resume response')
+  if (lastError) {
+    console.error('last error was:', lastError.message)
+  }
   return mockResumeResponse(resumeText)
 }
 
