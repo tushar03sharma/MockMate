@@ -11,7 +11,7 @@ const FILTER_OPTIONS = [ALL, ...CATEGORIES]
 // ─── Search icon ──────────────────────────────────────────────────────────────
 function SearchIcon() {
   return (
-    <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none">
+    <svg className="w-4 h-4 text-stone-400" viewBox="0 0 24 24" fill="none">
       <path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"
         stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
@@ -22,23 +22,23 @@ function SearchIcon() {
 function EmptyState({ onNavigate }) {
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center">
-      <div className="w-16 h-16 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center
+      <div className="w-16 h-16 rounded-full bg-teal-50 dark:bg-teal-900/20 flex items-center
                       justify-center mb-4">
-        <svg className="w-8 h-8 text-indigo-400" viewBox="0 0 24 24" fill="none">
+        <svg className="w-8 h-8 text-teal-500" viewBox="0 0 24 24" fill="none">
           <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2
                    M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
             stroke="currentColor" strokeWidth="1.2" fill="none" />
         </svg>
       </div>
-      <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-1">
+      <h3 className="text-lg font-semibold text-stone-700 dark:text-stone-200 mb-1">
         No attempts yet
       </h3>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+      <p className="text-sm text-stone-500 dark:text-stone-400 mb-5">
         Complete a practice session to see your history here.
       </p>
       <button
         onClick={() => onNavigate('interview')}
-        className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm
+        className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-sm
                    font-medium rounded-lg transition"
       >
         Start Practising
@@ -51,10 +51,10 @@ function EmptyState({ onNavigate }) {
 function NoResults({ onClear }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
-      <p className="text-gray-500 dark:text-gray-400 text-sm mb-3">
+      <p className="text-stone-500 dark:text-stone-400 text-sm mb-3">
         No attempts match your search or filter.
       </p>
-      <button onClick={onClear} className="text-indigo-500 hover:underline text-sm">
+      <button onClick={onClear} className="text-teal-600 hover:underline text-sm">
         Clear filters
       </button>
     </div>
@@ -91,7 +91,7 @@ export default function History({ onNavigate, currentPage }) {
   const clearFilters = () => { setSearch(''); setCategory(ALL) }
 
   return (
-    <div className="min-h-screen flex bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen flex bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100">
       <Sidebar onToggleTheme={onToggleTheme} onNavigate={onNavigate} currentPage={currentPage} />
 
       <main className="flex-1 p-6 pb-24 md:pb-6 overflow-y-auto">
@@ -99,10 +99,10 @@ export default function History({ onNavigate, currentPage }) {
 
           {/* ── Header ── */}
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">
+            <h1 className="text-xl font-semibold text-stone-800 dark:text-stone-100 mb-0.5">
               Interview History
             </h1>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">
+            <p className="text-stone-500 dark:text-stone-400 text-sm">
               {records.length} attempt{records.length !== 1 ? 's' : ''} saved locally
             </p>
           </div>
@@ -124,10 +124,10 @@ export default function History({ onNavigate, currentPage }) {
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Search questions…"
-                    className="w-full pl-9 pr-4 py-2.5 text-sm bg-white dark:bg-gray-900
-                               border border-gray-200 dark:border-gray-700 rounded-lg
-                               text-gray-900 dark:text-gray-100 placeholder-gray-400
-                               focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+                    className="w-full pl-9 pr-4 py-2.5 text-sm bg-white dark:bg-stone-900
+                               border border-stone-200 dark:border-stone-700 rounded-lg
+                               text-stone-900 dark:text-stone-100 placeholder-stone-400
+                               focus:ring-2 focus:ring-teal-400 focus:border-transparent
                                outline-none transition"
                   />
                 </div>
@@ -137,10 +137,10 @@ export default function History({ onNavigate, currentPage }) {
                   id="history-category-filter"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="px-4 py-2.5 text-sm bg-white dark:bg-gray-900
-                             border border-gray-200 dark:border-gray-700 rounded-lg
-                             text-gray-900 dark:text-gray-100
-                             focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+                  className="px-4 py-2.5 text-sm bg-white dark:bg-stone-900
+                             border border-stone-200 dark:border-stone-700 rounded-lg
+                             text-stone-900 dark:text-stone-100
+                             focus:ring-2 focus:ring-teal-400 focus:border-transparent
                              outline-none transition cursor-pointer"
                 >
                   {FILTER_OPTIONS.map((opt) => (
@@ -151,7 +151,7 @@ export default function History({ onNavigate, currentPage }) {
 
               {/* ── Results count ── */}
               {(search || category !== ALL) && (
-                <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
+                <p className="text-xs text-stone-400 dark:text-stone-500 mb-4">
                   Showing {filtered.length} of {records.length} attempts
                   {category !== ALL && ` · ${category}`}
                   {search && ` · "${search}"`}

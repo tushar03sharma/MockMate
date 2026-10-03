@@ -8,18 +8,17 @@ import { getInterviewFeedback } from '../utils/gemini'
 import { saveAttempt } from '../utils/history'
 import { CATEGORIES, getRandomQuestion } from '../utils/questions'
 
-// ─── Category pill colours ─────────────────────────────────────────────────────
+// ─── Category pill colours (natural tones) ────────────────────────────────────
 const CAT_ACTIVE = {
-  Frontend:   'bg-sky-600 text-white dark:bg-sky-500',
-  Backend:    'bg-violet-600 text-white dark:bg-violet-500',
-  DSA:        'bg-amber-500 text-white',
-  HR:         'bg-pink-600 text-white dark:bg-pink-500',
-  Behavioral: 'bg-emerald-600 text-white dark:bg-emerald-500',
+  Frontend:   'bg-sky-600 text-white',
+  Backend:    'bg-blue-700 text-white',
+  DSA:        'bg-amber-600 text-white',
+  HR:         'bg-rose-600 text-white',
+  Behavioral: 'bg-green-700 text-white',
 }
 const CAT_IDLE =
-  'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500'
+  'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-700 hover:border-stone-400 dark:hover:border-stone-500'
 
-// ─── Category Selector ─────────────────────────────────────────────────────────
 function CategorySelector({ selected, onSelect }) {
   return (
     <div className="flex flex-wrap gap-2">
@@ -39,10 +38,9 @@ function CategorySelector({ selected, onSelect }) {
   )
 }
 
-// ─── Error Card ───────────────────────────────────────────────────────────────
 function ErrorCard({ message, onRetry }) {
   return (
-    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 space-y-3">
+    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6 space-y-3">
       <div className="flex items-center gap-2">
         <svg className="w-5 h-5 text-red-500 shrink-0" viewBox="0 0 24 24" fill="none">
           <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
@@ -61,12 +59,8 @@ function ErrorCard({ message, onRetry }) {
   )
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
 export default function InterviewPractice({ onNavigate, currentPage, initialQuestion = null }) {
-  // If launched from Resume page, use that question; otherwise pick a random one
-  const [category, setCategory]   = useState(
-    initialQuestion?.category || 'Frontend'
-  )
+  const [category, setCategory]   = useState(initialQuestion?.category || 'Frontend')
   const [question, setQuestion]   = useState(() =>
     initialQuestion
       ? { text: initialQuestion.text, difficulty: initialQuestion.difficulty, category: initialQuestion.category }
@@ -84,7 +78,6 @@ export default function InterviewPractice({ onNavigate, currentPage, initialQues
     localStorage.setItem('theme', isDark ? 'dark' : 'light')
   }, [])
 
-  // ── Change category → pick a new question ───────────────────────────────────
   const handleCategorySelect = (cat) => {
     setCategory(cat)
     setQuestion(getRandomQuestion(cat))
@@ -93,7 +86,6 @@ export default function InterviewPractice({ onNavigate, currentPage, initialQues
     setError(null)
   }
 
-  // ── Shuffle to another question in same category ────────────────────────────
   const handleShuffle = () => {
     setQuestion(getRandomQuestion(category))
     setAnswer('')
@@ -101,7 +93,6 @@ export default function InterviewPractice({ onNavigate, currentPage, initialQues
     setError(null)
   }
 
-  // ── Submit: call the AI feedback API + auto-save ───────────────────────────
   const handleSubmit = async () => {
     if (!answer.trim()) {
       alert('Please enter your answer first.')
@@ -114,11 +105,8 @@ export default function InterviewPractice({ onNavigate, currentPage, initialQues
 
     try {
       const result = await getInterviewFeedback(question.text, answer)
-      console.log('feedback received:', result)
       setFeedback(result)
 
-      // save to localStorage so it shows up in history
-      // TODO: maybe ask user before saving? idk
       saveAttempt({
         question: question.text,
         difficulty: question.difficulty,
@@ -139,21 +127,19 @@ export default function InterviewPractice({ onNavigate, currentPage, initialQues
     }
   }
 
-  // ── Reset: back to answer input, same question ───────────────────────────
   const handleReset = () => {
     setAnswer('')
     setFeedback(null)
     setError(null)
   }
 
-  // ── Retry: clear error and resubmit ──────────────────────────────────────
   const handleRetry = () => {
     setError(null)
     handleSubmit()
   }
 
   return (
-    <div className="min-h-screen flex bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen flex bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100">
       <Sidebar onToggleTheme={onToggleTheme} onNavigate={onNavigate} currentPage={currentPage} />
 
       <main className="flex-1 p-6 pb-24 md:pb-6">
@@ -162,14 +148,14 @@ export default function InterviewPractice({ onNavigate, currentPage, initialQues
           {/* Header */}
           <div className="mb-6">
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+              <h1 className="text-xl font-semibold text-stone-800 dark:text-stone-100">
                 Interview Practice
               </h1>
               {fromResume && (
                 <span className="px-2.5 py-1 rounded-full text-xs font-medium
-                                 bg-indigo-100 text-indigo-700
-                                 dark:bg-indigo-900/40 dark:text-indigo-300
-                                 border border-indigo-200 dark:border-indigo-700
+                                 bg-teal-50 text-teal-700
+                                 dark:bg-teal-900/30 dark:text-teal-300
+                                 border border-teal-100 dark:border-teal-800
                                  flex items-center gap-1">
                   <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none">
                     <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
@@ -180,17 +166,17 @@ export default function InterviewPractice({ onNavigate, currentPage, initialQues
                 </span>
               )}
             </div>
-            <p className="text-gray-600 dark:text-gray-300 mt-2">
+            <p className="text-stone-500 dark:text-stone-400 text-sm mt-1">
               {fromResume
                 ? 'Practising a resume-tailored question. Answer below and get AI feedback.'
                 : 'Choose a category and get AI feedback on your answer.'}
             </p>
           </div>
 
-          {/* Category selector — hidden when question comes from Resume */}
+          {/* Category selector */}
           {!fromResume && (
             <div className="mb-5">
-              <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+              <p className="text-xs font-semibold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-2">
                 Category
               </p>
               <CategorySelector selected={category} onSelect={handleCategorySelect} />
@@ -202,13 +188,13 @@ export default function InterviewPractice({ onNavigate, currentPage, initialQues
             <QuestionCard question={question.text} difficulty={question.difficulty} />
           </div>
 
-          {/* Shuffle button */}
+          {/* Shuffle */}
           {!feedback && !isLoading && (
-            <div className="flex justify-end mb-6">
+            <div className="flex justify-end mb-5">
               <button
                 onClick={handleShuffle}
-                className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500
-                           hover:text-indigo-500 dark:hover:text-indigo-400 transition"
+                className="flex items-center gap-1.5 text-xs text-stone-400 dark:text-stone-500
+                           hover:text-teal-600 dark:hover:text-teal-400 transition"
               >
                 <svg viewBox="0 0 24 24" fill="none" className="w-3.5 h-3.5">
                   <path d="M17 1l4 4-4 4M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 01-4 4H3"
@@ -231,17 +217,17 @@ export default function InterviewPractice({ onNavigate, currentPage, initialQues
                   id="submit-answer"
                   onClick={handleSubmit}
                   disabled={!answer.trim()}
-                  className="flex-1 px-6 py-3 bg-indigo-600 hover:bg-indigo-700
-                             disabled:bg-gray-300 dark:disabled:bg-gray-700
-                             disabled:cursor-not-allowed text-white font-medium rounded-lg transition"
+                  className="flex-1 px-6 py-3 bg-teal-600 hover:bg-teal-700
+                             disabled:bg-stone-200 dark:disabled:bg-stone-700
+                             disabled:cursor-not-allowed text-white font-medium rounded-lg transition text-sm"
                 >
                   Submit Answer
                 </button>
                 <button
                   onClick={handleReset}
-                  className="px-6 py-3 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300
-                             dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100
-                             font-medium rounded-lg transition"
+                  className="px-6 py-3 bg-stone-100 dark:bg-stone-800 hover:bg-stone-200
+                             dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200
+                             font-medium rounded-lg transition text-sm"
                 >
                   Clear
                 </button>
@@ -249,20 +235,20 @@ export default function InterviewPractice({ onNavigate, currentPage, initialQues
             </div>
           )}
 
-          {/* Loading spinner */}
+          {/* Loading */}
           {isLoading && (
             <div className="mb-8">
               <LoadingAnimation />
             </div>
           )}
 
-          {/* Error state */}
+          {/* Error */}
           {error && !isLoading && (
             <div className="mb-8">
               <ErrorCard message={error} onRetry={handleRetry} />
               <button
                 onClick={handleReset}
-                className="mt-3 text-sm text-gray-500 dark:text-gray-400 hover:underline"
+                className="mt-3 text-sm text-stone-500 dark:text-stone-400 hover:underline"
               >
                 ← Edit my answer
               </button>
@@ -272,7 +258,6 @@ export default function InterviewPractice({ onNavigate, currentPage, initialQues
           {/* Feedback */}
           {feedback && !isLoading && (
             <div className="space-y-6">
-              {/* Saved indicator */}
               <div className="flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400">
                 <svg viewBox="0 0 24 24" fill="none" className="w-3.5 h-3.5">
                   <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2"
@@ -295,17 +280,17 @@ export default function InterviewPractice({ onNavigate, currentPage, initialQues
                 {!fromResume && (
                   <button
                     onClick={handleShuffle}
-                    className="flex-1 px-6 py-3 bg-indigo-600 hover:bg-indigo-700
-                               text-white font-medium rounded-lg transition"
+                    className="flex-1 px-6 py-3 bg-teal-600 hover:bg-teal-700
+                               text-white font-medium rounded-lg transition text-sm"
                   >
                     Try Next Question
                   </button>
                 )}
                 <button
                   onClick={() => onNavigate(fromResume ? 'resume' : 'history')}
-                  className="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-700
-                             hover:bg-gray-300 dark:hover:bg-gray-600
-                             text-gray-900 dark:text-gray-100 font-medium rounded-lg transition"
+                  className="flex-1 px-6 py-3 bg-stone-100 dark:bg-stone-800
+                             hover:bg-stone-200 dark:hover:bg-stone-700
+                             text-stone-700 dark:text-stone-200 font-medium rounded-lg transition text-sm"
                 >
                   {fromResume ? 'Back to Resume' : 'View History'}
                 </button>
