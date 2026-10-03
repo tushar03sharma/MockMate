@@ -3,6 +3,7 @@ import Dashboard         from './pages/Dashboard'
 import InterviewPractice from './pages/InterviewPractice'
 import History           from './pages/History'
 import Resume            from './pages/Resume'
+import Analytics         from './pages/Analytics'
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('dashboard')
@@ -23,10 +24,11 @@ export default function App() {
 
   return (
     <>
-      {currentPage === 'dashboard' && <Dashboard         onNavigate={handleNavigate} currentPage={currentPage} />}
-      {currentPage === 'interview' && <InterviewPractice onNavigate={handleNavigate} currentPage={currentPage} initialQuestion={pageParams} />}
-      {currentPage === 'history'   && <History           onNavigate={handleNavigate} currentPage={currentPage} />}
-      {currentPage === 'resume'    && <Resume            onNavigate={handleNavigate} currentPage={currentPage} />}
+      {currentPage === 'dashboard'  && <Dashboard         onNavigate={handleNavigate} currentPage={currentPage} />}
+      {currentPage === 'interview'  && <InterviewPractice onNavigate={handleNavigate} currentPage={currentPage} initialQuestion={pageParams} />}
+      {currentPage === 'history'    && <History           onNavigate={handleNavigate} currentPage={currentPage} />}
+      {currentPage === 'resume'     && <Resume            onNavigate={handleNavigate} currentPage={currentPage} />}
+      {currentPage === 'analytics'  && <Analytics         onNavigate={handleNavigate} currentPage={currentPage} />}
     </>
   )
 }
