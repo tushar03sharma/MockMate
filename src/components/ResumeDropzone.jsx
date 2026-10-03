@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react'
 import { validatePDF } from '../utils/resumeParser'
 
-// ─── Icons ─────────────────────────────────────────────────────────────────────
+//  Icons 
 function UploadIcon({ className = 'w-12 h-12' }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none">
@@ -56,7 +56,7 @@ export default function ResumeDropzone({ onFile, isProcessing, progress = 0, pro
     onFile(file)
   }
 
-  // ── Drag handlers ────────────────────────────────────────────────────────────
+  //  Drag handlers 
   function onDragOver(e) {
     e.preventDefault()
     setIsDragging(true)
@@ -72,7 +72,7 @@ export default function ResumeDropzone({ onFile, isProcessing, progress = 0, pro
     handleFile(file)
   }
 
-  // ── File input ───────────────────────────────────────────────────────────────
+  //  File input 
   function onInputChange(e) {
     const file = e.target.files?.[0]
     handleFile(file)
@@ -80,7 +80,7 @@ export default function ResumeDropzone({ onFile, isProcessing, progress = 0, pro
     e.target.value = ''
   }
 
-  // ── Processing state ─────────────────────────────────────────────────────────
+  //  Processing state 
   if (isProcessing) {
     return (
       <div className="w-full rounded-2xl border-2 border-indigo-200 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-950/30 p-10 flex flex-col items-center gap-5">

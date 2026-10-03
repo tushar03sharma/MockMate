@@ -1,53 +1,64 @@
 import React from 'react'
 
 const dashboardIcon = (
-  <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
-    <path d="M3 13h8V3H3v10zM3 21h8v-6H3v6zM13 21h8V11h-8v10zM13 3v6h8V3h-8z" stroke="currentColor" strokeWidth="1.2"/>
+  <svg viewBox="0 0 24 24" fill="none" className="w-4.5 h-4.5">
+    <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.4"/>
+    <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.4"/>
+    <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.4"/>
+    <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.4"/>
   </svg>
 )
 
 const practiceIcon = (
-  <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
-    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3" stroke="currentColor" strokeWidth="1.2" fill="none"/>
+  <svg viewBox="0 0 24 24" fill="none" className="w-4.5 h-4.5">
+    <path d="M8 6h8M8 10h5M5 4h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1z"
+      stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+    <path d="M15 16l-3-1.5V12l3-1.5V16z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/>
   </svg>
 )
 
 const historyIcon = (
-  <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
-    <path d="M12 8v4l2.5 2.5M3.05 11a9 9 0 1 0 .5-3M3 4v4h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+  <svg viewBox="0 0 24 24" fill="none" className="w-4.5 h-4.5">
+    <path d="M12 8v4l2.5 2.5M3.05 11a9 9 0 1 0 .5-3M3 4v4h4"
+      stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 )
 
 const resumeIcon = (
-  <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
-    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-    <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-    <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-    <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-    <polyline points="10 9 9 9 8 9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+  <svg viewBox="0 0 24 24" fill="none" className="w-4.5 h-4.5">
+    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+      stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+    <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+    <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+    <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
   </svg>
 )
 
-const settingsIcon = (
-  <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
-    <path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" strokeWidth="1.2"/>
+const analyticsIcon = (
+  <svg viewBox="0 0 24 24" fill="none" className="w-4.5 h-4.5">
+    <path d="M3 3v18h18" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+    <path d="M7 16l4-4 4 4 4-6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 )
 
 const themeIcon = (
   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" strokeWidth="1.2"/>
+    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" strokeWidth="1.4"/>
   </svg>
 )
 
 const NavItem = ({ children, icon, active, onClick }) => (
   <button
     onClick={onClick}
-    className={`w-full flex items-center gap-3 px-4 py-2 rounded-md text-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition ${
-      active ? 'bg-gray-100 dark:bg-gray-800 font-medium' : 'text-gray-700 dark:text-gray-200'
+    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all ${
+      active
+        ? 'bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-300 font-medium'
+        : 'text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800'
     }`}
   >
-    <span className="w-5 h-5 text-gray-500 dark:text-gray-300">{icon}</span>
+    <span className={`shrink-0 ${active ? 'text-teal-600 dark:text-teal-400' : 'text-stone-400 dark:text-stone-500'}`}>
+      {icon}
+    </span>
     <span>{children}</span>
   </button>
 )
@@ -56,10 +67,10 @@ const MobileNavItem = ({ children, icon, active, onClick }) => (
   <button
     onClick={onClick}
     className={`flex flex-col items-center gap-1 flex-1 py-2 text-xs transition ${
-      active ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400'
+      active ? 'text-teal-600 dark:text-teal-400' : 'text-stone-500 dark:text-stone-400'
     }`}
   >
-    <span className={`w-5 h-5 ${active ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400'}`}>
+    <span className={`${active ? 'text-teal-600 dark:text-teal-400' : 'text-stone-400 dark:text-stone-500'}`}>
       {icon}
     </span>
     <span>{children}</span>
@@ -70,85 +81,56 @@ export default function Sidebar({ onToggleTheme, onNavigate, currentPage = 'dash
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="w-64 hidden md:flex flex-col gap-4 p-4 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800">
-        <div className="text-lg font-semibold">MockMate</div>
-        <nav className="flex-1 flex flex-col gap-2">
-          <NavItem
-            icon={dashboardIcon}
-            active={currentPage === 'dashboard'}
-            onClick={() => onNavigate?.('dashboard')}
-          >
+      <aside className="w-56 hidden md:flex flex-col gap-2 py-5 px-3 bg-white dark:bg-stone-900 border-r border-stone-100 dark:border-stone-800">
+        {/* Logo */}
+        <div className="px-3 mb-3">
+          <span className="text-base font-semibold tracking-tight text-stone-800 dark:text-stone-100">MockMate</span>
+        </div>
+
+        <nav className="flex-1 flex flex-col gap-0.5">
+          <NavItem icon={dashboardIcon} active={currentPage === 'dashboard'} onClick={() => onNavigate?.('dashboard')}>
             Dashboard
           </NavItem>
-          <NavItem
-            icon={practiceIcon}
-            active={currentPage === 'interview'}
-            onClick={() => onNavigate?.('interview')}
-          >
+          <NavItem icon={practiceIcon} active={currentPage === 'interview'} onClick={() => onNavigate?.('interview')}>
             Practice
           </NavItem>
-          <NavItem
-            icon={resumeIcon}
-            active={currentPage === 'resume'}
-            onClick={() => onNavigate?.('resume')}
-          >
+          <NavItem icon={resumeIcon} active={currentPage === 'resume'} onClick={() => onNavigate?.('resume')}>
             Resume
           </NavItem>
-          <NavItem
-            icon={historyIcon}
-            active={currentPage === 'history'}
-            onClick={() => onNavigate?.('history')}
-          >
+          <NavItem icon={historyIcon} active={currentPage === 'history'} onClick={() => onNavigate?.('history')}>
             History
           </NavItem>
-          <NavItem icon={settingsIcon}>
-            Settings
+          <NavItem icon={analyticsIcon} active={currentPage === 'analytics'} onClick={() => onNavigate?.('analytics')}>
+            Analytics
           </NavItem>
         </nav>
-        <div className="mt-2">
+
+        <div className="border-t border-stone-100 dark:border-stone-800 pt-3 mt-1">
           <button
             onClick={onToggleTheme}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200"
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-stone-500 dark:text-stone-400
+                       hover:bg-stone-100 dark:hover:bg-stone-800 transition"
           >
             {themeIcon}
-            Toggle Theme
+            Toggle theme
           </button>
+          <p className="text-[10px] text-stone-300 dark:text-stone-700 px-3 mt-2">© 2026 Tushar Sharma</p>
         </div>
-        <div className="text-xs text-gray-400 dark:text-gray-600 px-1 pb-1">
-          © 2026 Tushar Sharma
-        </div>
-
       </aside>
 
-      {/* Mobile bottom navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 flex items-center px-2">
-        <MobileNavItem
-          icon={dashboardIcon}
-          active={currentPage === 'dashboard'}
-          onClick={() => onNavigate?.('dashboard')}
-        >
-          Dashboard
+      {/* Mobile bottom nav */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-stone-900 border-t border-stone-100 dark:border-stone-800 flex items-center px-2">
+        <MobileNavItem icon={dashboardIcon} active={currentPage === 'dashboard'} onClick={() => onNavigate?.('dashboard')}>
+          Home
         </MobileNavItem>
-        <MobileNavItem
-          icon={practiceIcon}
-          active={currentPage === 'interview'}
-          onClick={() => onNavigate?.('interview')}
-        >
+        <MobileNavItem icon={practiceIcon} active={currentPage === 'interview'} onClick={() => onNavigate?.('interview')}>
           Practice
         </MobileNavItem>
-        <MobileNavItem
-          icon={resumeIcon}
-          active={currentPage === 'resume'}
-          onClick={() => onNavigate?.('resume')}
-        >
+        <MobileNavItem icon={resumeIcon} active={currentPage === 'resume'} onClick={() => onNavigate?.('resume')}>
           Resume
         </MobileNavItem>
-        <MobileNavItem
-          icon={historyIcon}
-          active={currentPage === 'history'}
-          onClick={() => onNavigate?.('history')}
-        >
-          History
+        <MobileNavItem icon={analyticsIcon} active={currentPage === 'analytics'} onClick={() => onNavigate?.('analytics')}>
+          Analytics
         </MobileNavItem>
         <MobileNavItem icon={themeIcon} onClick={onToggleTheme}>
           Theme
