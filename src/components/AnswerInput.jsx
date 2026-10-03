@@ -3,15 +3,20 @@ import React from 'react'
 export default function AnswerInput({ value, onChange, placeholder = "Type your answer here..." }) {
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Your Answer</label>
+      <label className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">
+        Your Answer
+      </label>
       <textarea
         value={value}
         onChange={onChange}
         placeholder={placeholder}
         rows={8}
-        className="w-full p-4 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-lg text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition resize-none"
+        className="w-full p-4 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700
+                   rounded-xl text-stone-800 dark:text-stone-100 placeholder-stone-300
+                   dark:placeholder-stone-600 focus:ring-2 focus:ring-teal-400
+                   focus:border-transparent outline-none transition resize-none text-sm leading-relaxed"
       />
-      <div className="text-xs text-gray-500 dark:text-gray-400">
+      <div className="text-xs text-stone-400 dark:text-stone-500 text-right">
         {value.length} characters
       </div>
     </div>
